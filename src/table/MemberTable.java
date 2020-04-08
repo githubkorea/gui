@@ -2,16 +2,22 @@ package table;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JTabbedPane;
 import java.awt.GridLayout;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import java.util.Vector;
+
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+
+import database.MemberDAO;
+import database.MemberVO;
 
 public class MemberTable extends JFrame {
 
@@ -21,6 +27,14 @@ public class MemberTable extends JFrame {
 	private JTextField txtGender;
 	private JTextField textField;
 	private JTable table;
+	private final JLabel lblNewLabel_5 = new JLabel("나이");
+	private JTextField textField_1;
+	private JTextField textField_2;
+	private JTextField textField_3;
+	private JTable table_1;
+	
+	private MemberDAO dao;
+	private DefaultTableModel model;
 
 	/**
 	 * Launch the application.
@@ -41,6 +55,9 @@ public class MemberTable extends JFrame {
 	/**
 	 * Create the frame.
 	 */
+	/**
+	 * 
+	 */
 	public MemberTable() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -49,11 +66,14 @@ public class MemberTable extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 		
+		//DB 객체 생성
+		dao = new MemberDAO();
+		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 		
 		JPanel panel = new JPanel();
-		tabbedPane.addTab("New tab", null, panel, null);
+		tabbedPane.addTab("회원 등록",null, panel, null);
 		panel.setLayout(new GridLayout(0, 2, 0, 0));
 		
 		JLabel lblNewLabel = new JLabel("이름");
@@ -78,7 +98,7 @@ public class MemberTable extends JFrame {
 		txtGender.setColumns(10);
 		
 		JPanel panel_1 = new JPanel();
-		tabbedPane.addTab("New tab", null, panel_1, null);
+		tabbedPane.addTab("회원 조회", null, panel_1, null);
 		panel_1.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel_4 = new JPanel();
@@ -99,10 +119,74 @@ public class MemberTable extends JFrame {
 		panel_1.add(table, BorderLayout.CENTER);
 		
 		JPanel panel_2 = new JPanel();
-		tabbedPane.addTab("New tab", null, panel_2, null);
+		tabbedPane.addTab("회원 수정", null, panel_2, null);
+		panel_2.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panel_5 = new JPanel();
+		panel_2.add(panel_5);
+		panel_5.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblNewLabel_4 = new JLabel("수정할 회원 정보 입력");
+		panel_5.add(lblNewLabel_4, BorderLayout.NORTH);
+		
+		JPanel panel_6 = new JPanel();
+		panel_5.add(panel_6, BorderLayout.CENTER);
+		panel_6.setLayout(new GridLayout(0, 2, 0, 0));
+		
+		JLabel label = new JLabel("번호");
+		panel_6.add(label);
+		
+		textField_1 = new JTextField();
+		panel_6.add(textField_1);
+		textField_1.setColumns(10);
+		panel_6.add(lblNewLabel_5);
+		
+		textField_2 = new JTextField();
+		panel_6.add(textField_2);
+		textField_2.setColumns(10);
 		
 		JPanel panel_3 = new JPanel();
-		tabbedPane.addTab("New tab", null, panel_3, null);
+		tabbedPane.addTab("회원삭제", null, panel_3, null);
+		
+		JLabel lblNewLabel_6 = new JLabel("회원번호");
+		panel_3.add(lblNewLabel_6);
+		
+		textField_3 = new JTextField();
+		panel_3.add(textField_3);
+		textField_3.setColumns(10);
+		
+		JButton btnNewButton_1 = new JButton("삭제");
+		panel_3.add(btnNewButton_1);
+		
+		JPanel panel_7 = new JPanel();
+		tabbedPane.addTab("회원 전체 조회", null, panel_7, null);
+		panel_7.setLayout(new BorderLayout(0, 0));
+		
+		JScrollPane scrollPane = new JScrollPane();
+		panel_7.add(scrollPane, BorderLayout.NORTH);
+		
+		// memberTBL의 전체 내용 자겨오기
+		String columnNames[]= {"번호","이름","나이","성별"};
+		model = new DefaultTableModel(columnNames,0) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+				
+			}
+		};
+		table_1 = new JTable(model);
+		list();
+		scrollPane.setViewportView(table_1);
 	}
-
+	
+	public void list() {
+		Vector<MemberVO> vecList = dao.getList();
+				
+		//vecList에 들어있는 값을 table에 보여주기
+		for(MemberVO vo:vecList=dao.getList()) {
+			Object[] objList = {vo.getNo(),vo.getName(),vo.getAge(),vo.getGender()};
+			model.addRow(objList);
+		}
+		
+	}
 }

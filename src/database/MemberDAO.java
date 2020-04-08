@@ -19,14 +19,14 @@ public class MemberDAO {
 		
 	// 2. 커넉션 연결  커넥션연결은 드라이버매니저를 통해 연결한다
 	public Connection getConnection() {
-		String url="jdbc:oracle:thin:@localhost:1521;orcl";  // 데이터베이스 서버 주소 및 연결 문자열
+		String url="jdbc:oracle:thin:@localhost:1521:orcl";  // 데이터베이스 서버 주소 및 연결 문자열
 		String user="javadb";	// 허가받은 사용자 아이디
 		String password="12345";	// 비밀번호
 		
 		Connection con =null;
 		
 		try {
-			DriverManager.getConnection(url, user, password);
+			con=DriverManager.getConnection(url, user, password);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

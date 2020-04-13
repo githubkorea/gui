@@ -236,9 +236,8 @@ public class MemberTable extends JFrame implements ActionListener{
 			MemberVO vo = dao.getRow(no);
 			Object[] rowData = {vo.getNo(),vo.getName(),vo.getAge(),vo.getGender()};
 			model1.addRow(rowData);
-		}else if (e.getActionCommand().equals("수정")) {
-			system.out.println("원격저장소 수정");
 		}
+		system.out.println("원격저장소 추가");
 	}
 	
 	// 1. push >> 원격저장소로 올리기 (github)

@@ -8,54 +8,107 @@ import java.sql.SQLException;
 import java.util.Vector;
 
 public class MemberDAO {
-	// 드라이버 클래스 로드
-	static { // 1. 드라이버 로드
+	//드라이버 클래스 로드
+	static {
 		try {
-			Class.forName("oracle.jdbc.OracleDriver"); // 오라클은 어차피 DB연동 할꺼니까 static으로 먼저 끌어올림 클래스로드으으
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} 
-	}
-		
-	// 2. 커넉션 연결  커넥션연결은 드라이버매니저를 통해 연결한다
-	public Connection getConnection() {
-		String url="jdbc:oracle:thin:@localhost:1521:orcl";  // 데이터베이스 서버 주소 및 연결 문자열
-		String user="javadb";	// 허가받은 사용자 아이디
-		String password="12345";	// 비밀번호
-		
-		Connection con =null;
-		
-		try {
-			con=DriverManager.getConnection(url, user, password);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			Class.forName("oracle.jdbc.OracleDriver");
+		} catch (ClassNotFoundException e) {			
 			e.printStackTrace();
 		}
-		return con;  
 	}
+	
+	//커넥션 연결
+	public Connection getConnection() {
+		String url="jdbc:oracle:thin:@localhost:1521:orcl"; //데이터베이스 서버 주소 및 연결문자열
+		String user="javadb";  //허가받은 사용자 아이디
+		String password="12345";  // 비밀번호
 		
-	// 데이터베이스 요청 작업
-	 
+		Connection con=null;
+		try {
+			con=DriverManager.getConnection(url, user, password);
+		} catch (SQLException e) {			
+			e.printStackTrace();
+		}
+		return con;
+	}
+	
+	//데이터베이스 요청 작업
 	public Vector<MemberVO> getList(){
-		Vector<MemberVO> vecList = new Vector<MemberVO>();
+		Vector<MemberVO> vecList=new Vector<MemberVO>();
+		
 		String sql = "select * from memberTBL";
-		try (Connection con = getConnection();
-				PreparedStatement pstmt = con.prepareStatement(sql); 
-				ResultSet rs = pstmt.executeQuery()) {
-					
-				while (rs.next()) {
-					MemberVO vo = new MemberVO();
-					vo.setNo(rs.getInt(1));
-					vo.setName(rs.getString(2));
-					vo.setAge(rs.getInt(3));
-					vo.setGender(rs.getString(4));
-					vecList.add(vo);
-				}
+		try(Connection con = getConnection();
+			PreparedStatement pstmt = con.prepareStatement(sql);
+			ResultSet rs=pstmt.executeQuery()) {
+						
+			while(rs.next()) {
+				MemberVO vo = new MemberVO();
+				vo.setNo(rs.getInt(1));
+				vo.setName(rs.getString(2));
+				vo.setAge(rs.getInt(3));
+				vo.setGender(rs.getString(4));
+				vecList.add(vo);
+			}			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return vecList;
+	}
+	
+	public int insert(MemberVO vo) {
+		String sql="insert into memberTBL values(member_seq.nextval,?,?,?)";
+		int result=0;
+		try(Connection con = getConnection();
+			PreparedStatement pstmt=con.prepareStatement(sql)) {
+			
+			pstmt.setString(1, vo.getName());
+			pstmt.setInt(2, vo.getAge());
+			pstmt.setString(3, vo.getGender());
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		return result;
+	}
+	
+	//no에 해당하는 레코드 가져오기
+	public MemberVO getRow(int no) {
+		String sql="select * from memberTBL where no=?";
+		MemberVO vo=null;
+		try(Connection con=getConnection();
+			PreparedStatement pstmt=con.prepareStatement(sql)) {
+			pstmt.setInt(1, no);
+			ResultSet rs = pstmt.executeQuery();
+			if(rs.next()) {
+				vo=new MemberVO();
+				vo.setNo(rs.getInt(1));
+				vo.setName(rs.getString("name"));
+				vo.setAge(rs.getInt(3));
+				vo.setGender(rs.getString("gender"));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return vo;
+	}	
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
